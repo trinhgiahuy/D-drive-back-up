@@ -1,0 +1,120 @@
+-------------------------------------------------------------------------------
+-- Title      : Traffic light
+-- Project    : Course material for TKT-1212 Digitaalijärjestelmien toteutus
+-------------------------------------------------------------------------------
+-- File       : traffic_light_moore_2_noreg.vhd
+-- Author     : Ari Kulmala
+-- Created    : 12.10.2007
+-- Last update: 2011/02/01
+-- Description: Each light is shown a given amount of time
+--              Moore machine with 2 processes: ns/ps, output
+--              Output is _not_ registered
+--      
+-------------------------------------------------------------------------------
+-- Copyright (c) 2007 Ari Kulmala
+-------------------------------------------------------------------------------
+-- Revisions  :
+-- Date        Version  Author  Description
+-- 12.10.2007  1.0      AK      Created
+-- 2011/02/01  1.1      ES      Beautifying things
+-------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.traffic_light_pkg.all;
+
+entity traffic_light is
+  generic (
+    yellow_length_g : integer := 10
+    );
+  port (
+    clk          : in  std_logic;
+    rst_n        : in  std_logic;
+    -- requests are active until the shown color is right (specification)
+    red_req_in   : in  std_logic;       -- request a change to red
+    green_req_in : in  std_logic;       -- request a change to green
+    r_y_g_out    : out std_logic_vector(n_colors_c-1 downto 0)
+    );
+
+end traffic_light;
+
+architecture rtl_moore_2_noreg of traffic_light is
+
+  -- Enumerate possible states with human readable names
+  type states_type is (red, yellow, green);
+  signal curr_state_r : states_type;
+
+  
+  -- Timer for showing yellow for appropriate time period
+  signal yellow_cnt_r : integer range 0 to yellow_length_g-1;
+  
+begin  -- rtl
+
+
+  -- Process 1 handles the registers (state_r and counter) inlucding
+  -- the logic need for changing states
+  sync_ps : process (clk, rst_n)
+  begin  -- process sync_ps
+    
+    if rst_n = '0' then                 -- asynchronous reset (active low)
+
+      curr_state_r <= red;              -- init state
+      yellow_cnt_r <= 0;
+      
+    elsif clk'event and clk = '1' then  -- rising clock edge
+
+      case curr_state_r is
+
+        when red =>
+          if green_req_in = '1' then
+            curr_state_r <= yellow;
+            yellow_cnt_r <= 0;
+          end if;
+
+          
+        when yellow =>
+
+          if yellow_cnt_r = yellow_length_g-1 then
+            -- It's time to change the light
+            yellow_cnt_r <= 0;
+
+            if green_req_in = '1' and red_req_in = '0' then
+              curr_state_r <= green;
+            else
+              curr_state_r <= red;
+            end if;
+
+          else
+            yellow_cnt_r <= yellow_cnt_r+1;
+          end if;
+          
+          
+        when green =>
+          if red_req_in = '1' then
+            curr_state_r <= yellow;
+            yellow_cnt_r <= 0;
+          end if;
+          
+          -- No "when others" needed since case is unambigous
+      end case;
+    end if;
+  end process sync_ps;
+
+
+  -- Output determined combinatorially from current state
+  -- Nice and clean in this case
+  output : process (curr_state_r)
+  begin  -- process output
+    case curr_state_r is
+      when red =>
+        r_y_g_out <= red_color_c;
+      when green =>
+        r_y_g_out <= green_color_c;
+      when others =>
+        r_y_g_out <= yellow_color_c;
+    end case;
+    
+  end process output;
+  
+end rtl_moore_2_noreg;
