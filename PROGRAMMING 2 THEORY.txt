@@ -1,0 +1,312 @@
+pass by reference, constant reference, value and pointer
+
+
+int calculatePower(int base, int powerRaised)
+{
+    if (powerRaised != 0)
+        return (base*calculatePower(base, powerRaised-1));
+    else
+        return 1;
+}
+
+**Direct recursion
+int factorial(int n) {
+    if (n > 1) {
+        return n * factorial(n - 1);
+    } else {
+        return 1;
+    }
+}
+
+** Tail recursion
+unsigned int factorial(unsigned int n, unsigned int result) {
+    if ( n == 0 ) {
+        return result;
+    } else {
+        return factorial(n - 1, n * result);
+    }
+}
+_____________________________ Record Type (Struct)
+struct Product {
+	string product_name;
+	double price;
+};
+
+Product item = {"soap", 1.23};
+
+item.price = item.price * 0.9;
+
+item = {"orange", 0.45}
+
+use struct as a value to store in STL container
+
+_____________________________ Enumeration Type ()
+
+enum BOOK_STATUS {ON_THE_sHELF, BORROWED, RESERVED , LOST}
+
+enum Month { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY,
+             AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER, MONTHS_IN_YEAR
+};
+
+_____________________________ File management
+#include <iostream>
+#include <fstream>  // Notice the required library for file handling
+
+//ifstream for reading file and ofsteam for writting to file and 
+//pass a filename as a parameter
+#include <string>
+ 
+using namespace std;
+ 
+int main() {
+    string filename = "";
+    cout << "Input file name: ";
+    getline(cin, filename);
+ 
+    ifstream file_object(filename);
+    if ( not file_object ) {
+        cout << "Error: failed opening the file." << endl;
+    } else {
+        int sum = 0;
+        string line;
+        while ( getline(file_object, line) ) {
+            sum += stoi(line);
+        }
+        file_object.close();
+        cout << "Sum: " << sum << endl;
+    }
+}
+
+_____________________________ STL iterator
+Iterators are data types (or variables, depending on the context) you can use to examine and modify the elements stored in a container. 
+You can think of the iterator as a bookmark that remembers the location of one element in a container.
+To be precise, the iterator does not point to the element, it points to the space between two elements
+
+container_type<element_type>::iterator
+container_type<element_type>::const_iterator
+
+
+The const_iterator type allows the programmer to examine the elements in the container, not edit them. 
+You need this kind of iterators if the container variable has been defined as a constant with the keyword const
+
+However, if we want to be able to change the container’s elements in the body of the for structure, we should define the iterating variable as a reference:
+
+ for ( auto& element: numbers ) {
+        element *= 2;
+    }
+	
+	
+	
+_____________________________ STL alogrithim
+
+vector<char> char_vector(word.length());
+
+bool compare_ids(const Student& stud1, const Student& stud2) {
+    return stud1.fetch_student_id() < stud2.fetch_student_id();
+}
+sort(students.begin(), students.end(), compare_ids);
+
+// Higher order functions
+Functions with other functions as their parameter are called higher-order functions.
+
+The functions compare_ids is so-called comparison functions:
+
+
+_____________________________ More STL container
+two associative container types provided by C++:
+*set is completely analoguous with the Python set type, which is identical with the mathematical set where each value can exist no more than once.		//#include <set>
+*map works similarly to dict in Python. It includes pairs of a key and a mapped value, and it is quick to find the mapped value you need, if you know the key attached to it. //#include <map>
+
+set<int> prime_num = {2,3,5,7};
+
+set<string> name ;
+name = {"da", "dasd" , "dasda"};
+name.insert("ddd");
+
+
+map<string, double> prices_2 = {
+    { "milk",   1.05 },
+    { "cheese", 4.95 },
+    { "glue",   3.65 },
+};
+
+dictionary_1.insert( { word, word_in_finnish } );
+    
+map<int, string>::iterator iter;
+iter = students.begin();
+while ( iter != students.end() ) {
+	cout << iter->first << " "
+        << iter->second << endl;
+    ++iter;
+    }
+}
+
+//avoid using iterator
+ for ( auto data_pair : students ) {
+        cout << data_pair.first << " "
+             << data_pair.second << endl;
+    }
+
+_____________________________ Pairs 				//#include <utility>
+
+pair <int, char> pair1;
+pair1.first = 1;
+pair1.second = 'a';
+
+pair <int, char> pair2 (1, 'a');
+
+pair <int, char> pair3;
+pair3 = make_pair(1, 'a');
+
+auto pair4 = make_pair(1, 'a)
+
+_____________________________ Map and set are ordered container
+STL provides counterparts for map and set, called unordered_map and unordered_set.
+
+_____________________________ Recursion
+
+A function is recursive if it calls itself (directly or indirectly).
+*During the execution, as many instances of the recursive function are ”on” as there are unfinished recursive calls.
+*Each instance has its own values for the parameters and local variables.
+
+
+
+************  Characteristic of recursive function
+*It has to have a terminating condition (or several) that recognizes the trivial cases of the problem and reacts to them without having to make a new recursive call.
+*Each recursive call has to simplify the problem in question in order to finally reach the trivial case.
+
+************ Recursion compare to loop
+Recursion creates repetition. In principle, any loop structure can be replaced with a recursion. 
+The best use of recursion is solving problems that are, by nature, recursive. 
+You can simplify them ”naturally” in a way that the REDUCED SUB-PROBLEMS are simplified cases of the original problem.
+
+Often, a recursive solution is shorter and cleaner than a corresponding loop structure solution. 
+However, usually the recursive solution is at least slightly slower and uses more memory than the loop structure.
+
+*Note:
+
+[1]	Data structures can also be recursive.
+[2]	And the other data concerning the earlier recursion rounds.
+
+
+_____________________________ Different kind of recursion:
+
+**Direct recursion 
+happens when a function CALLS ITSELF IN ITS OWN BODY. 
+For instance, factorial in the previous example uses direct recursion.
+
+**Indirect recursion or mutual recursion 
+means that the function func_a calls the function func_b which, in turn, calls func_a, et cetera:
+
+
+**Tail recursion
+if the recursive call is located in such a point in the function that after the call, THERE ARE NO STATEMENTS TO EXECUTE OR EXPRESSIONS TO EVALUATE. 
+In other words, when the recursions ”unwind”, there are no actions left in the called function.
+
+
+
+**Direct recursion
+int factorial(int n) {
+    if (n > 1) {
+        return n * factorial(n - 1);
+    } else {
+        return 1;
+    }
+}
+
+** Tail recursion
+unsigned int factorial(unsigned int n, unsigned int result) {
+    if ( n == 0 ) {
+        return result;
+    } else {
+        return factorial(n - 1, n * result);
+    }
+}
+
+
+Self implement:
+int calculatePower(int base, int power){
+	if (power == 0 ){
+		return 1;
+	}else {
+		return base*calculatePower(base,power-1);
+	}
+}
+
+Tail calculatePower:
+
+int tail_calculatePower(int base, int power, int result){			//result = 1 in main loop
+	if (power == 0){
+		return result;
+	}else{
+		return calculatePower(base, power-1, result*base);
+	}
+
+}
+
+_____________________________ Debugging
+
+Debugging is a programming term used to describe the locating and correcting of errors in a program. 
+Often, but not always, the most demanding part of it is locating the error.
+
+The first mechanism is TEST PRINTING.
+you add print commands (print, cout) into the code around the expected error, purely with the purpose of testing the code
+
+The other mechanism is DEBUGGER.
+
+_____________________________ Pointer
+
+A dangling ponter means either a reference or a pointer targeting a variable that no longer exists.
+
+
+_____________________________ Array 
+IF you give an array as a parameter to a function, the array will always act like a reference parameter,
+
+
+In practice, pointer arithmetic is also the reason why the code
+
+cout << numbers[2] << endl;
+numbers[1] = 99;
+means the same as the code
+
+cout << *(numbers + 2) << endl;
+*(numbers + 1) = 99;
+
+_____________________________ Dynamic allocate memorry
+
+allocate a new dynamic variable with the command new:
+
+ the operation new returns a pointer, the value of which reveals where the new dynamic variable is located within the main memory
+ 
+_____________________________ memory leak
+not all the memory allocated with new can be deallocated,
+
+
+int* dyn_variable_address = nullptr;
+dyn_variable_address = new int(7);
+delete dyn_variable_address;
+
+_____________________________ Linked list : One basic mechanism for implementing dynamic data structures 
+
+
+_____________________________ Smart Pointer
+The smart pointers of C++ are library data types that automate the deallocating of memory when nothing points to it anymore
+
+
+_____________________________ Modularity
+Modularity is a mechanism that divides a large program into small, more easily manageable parts when designing and implementing a program
+
+Module is a whole consisting of cohesive programming structures.
+modules are similar to classes: Each module has a public and a private interface.
+
+_____________________________ Class
+A class is simply a representation of a type of object.
+
+4 characteristic of OOP
+1. Encapsulation
+
+2. Abstraction
+
+3. Inheritance
+
+4. Polymorphism.
